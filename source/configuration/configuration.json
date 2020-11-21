@@ -1,0 +1,36 @@
+{
+    "dataset": {
+        "dataset_path": "../../dataset/dataset.csv",
+        "image_path": "/media/steve/Data2/unsplash-dataset/unsplash-original/",
+        "resized_path": "/media/steve/Data2/unsplash-dataset/unsplash-horizontal-big/",
+        "tfrecords_path" : "/media/steve/Data2/unsplash-dataset/tfrecords/tf-records-square/"        
+    },
+
+    "tfrecords":{
+        "csv_data_path": "/home/steve/Documents/Msc data science/Thesis/dataset/horizontal/",
+        "img_path": "/media/steve/Data2/unsplash-dataset/unsplash-horizontal-big/",
+        "io_path": "/media/steve/Data2/unsplash-dataset/tfrecords/tf-records-horizontal/"
+    },
+
+    "training":{
+        "training_method": "loop",
+        "epochs": 10,
+        "batch_size" : 50,
+        "lr" : 1e-04,
+        "optimizer" : "sgd",
+        "restore_model": false,
+        "model_save": true,
+        "img_size_x": 300,
+        "img_size_y": 200,
+        "normalize": true,
+        "augment": false,
+        "1h": true,
+        "save_ckpts": true,
+        "label": "DoF_bin"
+
+    },
+
+    "output":{
+        "model_path": "source/model/model.h5"
+    }
+}
