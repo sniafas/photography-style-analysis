@@ -21,6 +21,11 @@ For more details about images, please check CHANGELOG->DATA and DOCS->image_anal
 Source code in the repository is organized in such way that training must be run from the root of the repository. Anything else can be launched from the ``interfaces`` module, where is stated.
 If you use and IDE, set the *Working Directory* point to the root of the repository.
 
+## Dataset exploration - import new dataset
+
+Launch corresponded *ipynb* notebooks from ``interfaces`` module
+
+
 ## Image transformation
 
 From im_analysis module
@@ -46,7 +51,3 @@ To run training, you will need a CUDA capable GPU with cuda/cuDNN drivers.
 ```
 python train_model.py
 ```
-
-## Dataset exploration - import new dataset
-
-Launch corresponded *ipynb* notebooks from ``interfaces`` module
