@@ -371,10 +371,6 @@ class ImageAnalysis(object):
 
     def main(self):
 
-        # Run image resize
-        # p_map(self.resize, list(range(0, len(self.image_path))), num_cpus=8)
-        # sEDzxW4NhL4 has issue
-
         self.resize2ratio(0, 200, 300)
 
 
@@ -382,14 +378,10 @@ if __name__ == "__main__":
 
     config = Configuration().get_configuration()
 
-    dataset = config["dataset"]["dataset_path"]
+    dataset = config["dataset"]["image_transform_dataset_path"]
     input_image_path = config["dataset"]["img_path"]
     write_path = config["dataset"]["resized_path"]
 
-    # ia = ImageAnalysis(
-    #    dataset='../../../dataset/horizontal/train_horizontal.csv', dataset_path='/media/steve/Data2/unsplash-dataset/unsplashed-resized/', write_path='/media/steve/Data2/unsplash-dataset/unsplashed-horizontal/')
     ia = ImageAnalysis(dataset=dataset, dataset_path=input_image_path, write_path=write_path)
 
-    #'/media/steve/Data2/unsplash-dataset/unsplash-v1.1.0+/' -> resize dataset_path
-    #'/media/steve/Data2/unsplash-dataset/unsplashed-resized/' -> resize write_path
     ia.main()
