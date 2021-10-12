@@ -1,0 +1,22 @@
+[tool.black]
+line-length = 119
+
+[tool.poetry]
+name = "photography-style-analysis"
+version = "0.1"
+description = ""
+authors = ["Stavros Niafas"]
+license = "Apache 2.0"
+
+[tool.poetry.dependencies]
+black = "^21.6b0"
+jupyterlab = "^3.0.16"
+scikit-learn = "0.23.2"
+matplotlib = "^3.3.3"
+numpy = "1.18.5"
+opencv-python-headless = "~=4.3.0"
+p_tqdm = "*"
+pandas = "~=1.1.4"
+python = "^3.6.9"
+tensorflow = "2.3.1"
+tensorflow_addons = "0.11.2"
