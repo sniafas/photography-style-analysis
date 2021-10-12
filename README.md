@@ -1,16 +1,18 @@
-# Msc-Thesis
+[![python-version](https://img.shields.io/badge/python-v3.8-blue&?style=flat)](https://www.python.org/) 
+![docker](https://shields.io/badge/tensorflow-2.4-simple?logo=tensorflow&style=flat)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Repository of my Msc Data Science thesis. 
+# Photography Style Analysis Using Machine Learning
 
 ## Download images
 
 Lite dataset contains 25K images in high resolution [~211GB].
 For this project, images are transformed and released in
 
-- **Square (400x400) dataset:** [⬇️images](https://drive.google.com/file/d/1Eht4PDWlRWhWalWXP53da8CvaWy1TBEx/view?usp=sharing) [1.4GB], [⬇️tfrecords](https://drive.google.com/file/d/1kTv-ANmbjIt20hKehGNOJohtS5HFUHzx/view?usp=sharing) [1.2GB]
+- **Horizontal (900x600) dataset:** [⬇️images]https://drive.google.com/file/d/1zgNqZMDsziN0M3gCeXSHOkmP6wW_owsG/view?usp=sharing) [2.21GB]
 
+- **Square (400x400) dataset:** [⬇️images](https://drive.google.com/file/d/1E6TqDAy9BBc0rP2WN92F8pUmA5x3LfQt/view?usp=sharing) [1.29GB]
 
-- **Horizontal (300x200) dataset:** [⬇️images](https://drive.google.com/file/d/1h_Q5NvDRhaP0cNyjmwOg7wucCtBijy-0/view?usp=sharing) [418MB], [⬇️tfrecords](https://drive.google.com/file/d/1uGljFTsXoi-MMzxKjtirs5FeSmYAdDUR/view?usp=sharing) [414MB]
 
 For more details about images, please check CHANGELOG->DATA and DOCS->image_analysis
 
@@ -18,12 +20,6 @@ For more details about images, please check CHANGELOG->DATA and DOCS->image_anal
 
 ## Running scripts
 
-Source code in the repository is organized in such way that training must be run from the root of the repository. Anything else can be launched from the ``interfaces`` module, where is stated.
-If you use and IDE, set the *Working Directory* point to the root of the repository.
-
-## Dataset exploration - import new dataset
-
-Launch corresponded *ipynb* notebooks from ``interfaces`` module
 
 
 ## Image transformation
@@ -33,17 +29,9 @@ From im_analysis module
 python im_analysis.py
 ```
 
-## Generate TFrecords
-
-1. Edit ``configuration.json``
-2. From ``interfaces`` module:
-```
-python write_tf_records.py
-```
-
 ## Training
 
-To run training, you will need a CUDA capable GPU with cuda/cuDNN drivers.
+To initiate training, you will need a CUDA capable GPU with cuda/cuDNN drivers enabled.
 1. Edit ``configuration.json``
 2. (optional) Edit architecture from ``architectures`` module
 2. Train model
