@@ -15,7 +15,7 @@ For this project, images are transformed and released in
 
 - **Annotations**: [⬇️download](https://drive.google.com/drive/folders/1_R5zhWI-ZMQ7al_Pb7m8GXGyjjBI92Yf?usp=sharing)
 
-- **Pretrained Models**: [⬇️download](https://drive.google.com/drive/folders/1eEZiWqc_LJa12QMf9qKzKh8-vR0gAKM-?usp=sharing
+- **Pretrained Models**: [⬇️download](https://drive.google.com/drive/folders/1eEZiWqc_LJa12QMf9qKzKh8-vR0gAKM-?usp=sharing)
 
 For more details about images, please check CHANGELOG->DATA and DOCS->image_analysis
 
