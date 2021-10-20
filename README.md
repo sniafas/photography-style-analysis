@@ -9,17 +9,19 @@
 Lite dataset contains 25K images in high resolution [~211GB].
 For this project, images are transformed and released in
 
-- **Horizontal (900x600) dataset:** [⬇️images](https://drive.google.com/file/d/1zgNqZMDsziN0M3gCeXSHOkmP6wW_owsG/view?usp=sharing) [2.21GB]
+- **Horizontal (900x600) images:** [⬇️download](https://drive.google.com/file/d/1zgNqZMDsziN0M3gCeXSHOkmP6wW_owsG/view?usp=sharing) [2.21GB]
 
-- **Square (400x400) dataset:** [⬇️images](https://drive.google.com/file/d/1E6TqDAy9BBc0rP2WN92F8pUmA5x3LfQt/view?usp=sharing) [1.29GB]
+- **Square (400x400) images:** [⬇️download](https://drive.google.com/file/d/1E6TqDAy9BBc0rP2WN92F8pUmA5x3LfQt/view?usp=sharing) [1.29GB]
 
+- **Annotations**: [⬇️download](https://drive.google.com/drive/folders/1_R5zhWI-ZMQ7al_Pb7m8GXGyjjBI92Yf?usp=sharing)
+
+- **Pretrained Models**: [⬇️download](https://drive.google.com/drive/folders/1eEZiWqc_LJa12QMf9qKzKh8-vR0gAKM-?usp=sharing
 
 For more details about images, please check CHANGELOG->DATA and DOCS->image_analysis
 
 # Repository organization
 
 ## Running scripts
-
 
 
 ## Image transformation

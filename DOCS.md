@@ -20,11 +20,10 @@ Project's configuration entry point. Configuration is used from modules of the p
 
 ## image_analysis
 
-Image analysis handles the image transformation before tfrecord generation and training process.
+Image analysis handles the image transformation before training process.
  - It can transform images to any given ratio with ratio handling for both dimensions. When transforming and image to new ratio, it might not exactly fit to the target ratio 
     - exceeding resolution -> crop image to fit ratio
     - missing resolution -> 0pad image to fit ratio
-- General resize images to reduce disk size(depricated, not used from the project), checks orientation(depricated, since new unsplash release),
 Images have to follow a standard ratio (3:2).
 
 ## interfaces
