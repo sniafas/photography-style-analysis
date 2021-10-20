@@ -105,29 +105,25 @@ class Train:
             # pool dataset for active learning simulation
             if mode == "random":
                 print("Randomly selected samples")
-                # this set comprises of 1000 pre-randomly selected and 1000 pre-actively selected samples
-                # 0-> 1000, 1-> 1000
-                print("------------{}----------".format(cardinality_split))
-                pool_dataset = pd.read_csv(self.al_pool_dataset)
+                print(f"------------{cardinality_split}----------")
 
-                save_model_name = "../trained_models/randomly_results/{}/model_rnd_{}_seed_{}.h5".format(
-                    self.model_arch, cardinality_split, SEED
+                pool_dataset = pd.read_csv(self.al_pool_dataset)
+                base_dir = "randomly_results"
+
+                save_model_name = get_filepath(f"trained_models/{base_dir}/{self.model_arch}", f"model_rnd_{cardinality_split}_seed_{SEED}.h5")
+                save_training_hist_name = get_filepath(
+                    f"trained_models/{base_dir}/{self.model_arch}", f"training_hist_model_rnd_{cardinality_split}_seed_{SEED}"
                 )
-                save_training_hist_name = (
-                    "../trained_models/randomly_results/{}/results/training_hist_model_rnd_{}_seed_{}".format(
-                        self.model_arch, cardinality_split, SEED
-                    )
+                save_test_results_name = get_filepath(
+                    f"trained_models/{base_dir}/{self.model_arch}", f"test_results_model_rnd_{cardinality_split}_seed_{SEED}.json"
                 )
-                save_test_results_name = (
-                    "../trained_models/randomly_results/{}/results/test_results_model_rnd_{}_seed_{}.json".format(
-                        self.model_arch, cardinality_split, SEED
-                    )
+                save_cm_name = get_filepath(f"trained_models/{base_dir}/{self.model_arch}", f"cm_model_rnd_{cardinality_split}_{SEED}")
+
+                save_report_name = get_filepath(
+                    f"trained_models/{base_dir}/{self.model_arch}", f"report_model_rnd_{cardinality_split}_seed_{SEED}"
                 )
-                save_cm_name = "../trained_models/randomly_results/{}/results/cm_model_rnd_{}_seed_{}".format(
-                    self.model_arch, cardinality_split, SEED
-                )
-                save_report_name = "../trained_models/randomly_results/{}/results/report_model_rnd_{}_seed_{}".format(
-                    self.model_arch, cardinality_split, SEED
+                save_training_hist_plot = get_filepath(
+                    f"trained_models/{base_dir}/{self.model_arch}", f"learning_history_rnd_{cardinality_split}_seed_{SEED}"
                 )
 
                 train_data, valid_data = active_data_splits(
@@ -360,21 +356,21 @@ class Train:
 
             else:
                 print("Train baseline")
-                baseline_dir = "baseline"
+                base_dir = "baseline"
 
-                save_model_name = get_filepath(f"trained_models/{baseline_dir}/{self.model_arch}", "model.h5")
+                save_model_name = get_filepath(f"trained_models/{base_dir}/{self.model_arch}", "model.h5")
                 save_training_hist_name = get_filepath(
-                    f"trained_models/{baseline_dir}/{self.model_arch}", "training_hist_model"
+                    f"trained_models/{base_dir}/{self.model_arch}", "training_hist_model"
                 )
                 save_test_results_name = get_filepath(
-                    f"trained_models/{baseline_dir}/{self.model_arch}", "test_results_model_tuned.json"
+                    f"trained_models/{base_dir}/{self.model_arch}", "test_results_model.json"
                 )
-                save_cm_name = get_filepath(f"trained_models/{baseline_dir}/{self.model_arch}", "cm_model_tuned")
+                save_cm_name = get_filepath(f"trained_models/{base_dir}/{self.model_arch}", "cm_model")
                 save_report_name = get_filepath(
-                    f"trained_models/{baseline_dir}/{self.model_arch}", "report_model_tuned"
+                    f"trained_models/{base_dir}/{self.model_arch}", "report_model"
                 )
                 save_training_hist_plot = get_filepath(
-                    f"trained_models/{baseline_dir}/{self.model_arch}", "learning_curves"
+                    f"trained_models/{base_dir}/{self.model_arch}", "learning_history"
                 )
 
             # start training process with concatenated dataset, baseline dataset + pool dataset(random or active)
