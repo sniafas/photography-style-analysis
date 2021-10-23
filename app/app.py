@@ -29,7 +29,7 @@ st.sidebar.text("")
 models = ["DenseNet (baseline)", "VGG16 (baseline)", "DenseNet (best)", "VGG16 (best)"]
 
 model_choice = []
-st.sidebar.write("Which model do you want to use for the prediction?")
+st.sidebar.write("Choose a model for prediction")
 model_choice.append(st.sidebar.radio("", models))
 
 # ---------------------------------#
@@ -42,10 +42,8 @@ col1, col2, col3 = st.beta_columns([1, 6, 1])
 with col2:
     st.title("Depth of Field detection w/ Deep Learning")
 
-with col2:
-    st.write("This is a Bokeh detection app!")
 
-example_image = np.array(Image.open("media/XRwDE7DnDbg.jpg"))
+example_image = np.array(Image.open("XRwDE7DnDbg.jpg"))
 with col2:
     st.image(example_image, caption="An example input w/ shallow dof (Bokeh).", width=300)
 
