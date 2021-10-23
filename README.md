@@ -28,7 +28,7 @@ For more details about images, please check CHANGELOG->DATA and DOCS->image_anal
 $ pip install --user poetry
 
 # Install project's dependencies
-$ pip install --user poetry
+$ poetry install
 
 # Enable environment
 $ poetry shell
