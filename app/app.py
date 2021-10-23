@@ -44,9 +44,9 @@ with col2:
 
 with col2:
     st.image(
-        "https://source.unsplash.com/iEmpY2HvOeU/960x640",
+        "https://source.unsplash.com/fYnyfx3UBxk/960x640",
         caption="An example input w/ shallow dof (Bokeh).",
-        width=800,
+        width=1200,
     )
 
 with col2:
