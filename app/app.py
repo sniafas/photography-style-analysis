@@ -36,19 +36,21 @@ model_choice.append(st.sidebar.radio("", models))
 
 # Main Page options
 
-col1, col2, col3 = st.beta_columns([1, 6, 1])
+col1, col2, col3 = st.columns([1, 6, 1])
 
 
 with col2:
     st.title("Depth of Field detection w/ Deep Learning")
 
-
-example_image = np.array(Image.open("XRwDE7DnDbg.jpg"))
 with col2:
-    st.image(example_image, caption="An example input w/ shallow dof (Bokeh).", width=300)
+    st.image(
+        "https://source.unsplash.com/iEmpY2HvOeU/960x640",
+        caption="An example input w/ shallow dof (Bokeh).",
+        width=800,
+    )
 
 with col2:
-    file = st.file_uploader("Upload an image", type=["jpg"])
+    file = st.file_uploader("Upload an image", type=["jpg", "jpeg"])
 
 with col2:
 
@@ -73,9 +75,9 @@ with col2:
                     execute_bar.progress(percent_complete + 1)
             prob = prediction["probability"]
             if prediction["class"] == 0:
-                st.header("Prediction: Bokeh {:.2f}%".format(prob * 100))
+                st.header("Prediction: Bokeh - Confidence {:.1f}%".format(prob * 100))
             elif prediction["class"] == 1:
-                st.header("Prediction: No bokeh detected - deep depth of field")
+                st.header("Prediction: No bokeh detected - Confidence {:.1f}%".format(prob * 100))
 
             st.write("Took {} seconds to run.".format(round(time.time() - start_time, 2)))
 
