@@ -1,7 +1,6 @@
 """Streamlit web app for depth of field detection"""
 
 import time
-import numpy as np
 from PIL import Image
 import streamlit as st
 from bokeh import app_dof_predict
@@ -35,14 +34,13 @@ with st.container():
     if file is not None:
         img = Image.open(file)
         temp_file.write(file.getvalue())
-        st.image(img, caption="Uploaded image", width=600)
+        st.image(img, caption="Uploaded image", use_column_width="auto")
 
         if st.button("Predict"):
             st.write("")
             st.write("Working...")
 
             start_time = time.time()
-            scores = np.zeros((1, 7))
 
             for choice in model_choice:
                 prediction = app_dof_predict(choice, temp_file.name)
