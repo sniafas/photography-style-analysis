@@ -2,7 +2,6 @@
 
 import time
 import numpy as np
-import pandas as pd
 from PIL import Image
 import streamlit as st
 from bokeh import app_dof_predict
@@ -11,16 +10,8 @@ from tempfile import NamedTemporaryFile
 
 temp_file = NamedTemporaryFile(delete=False)
 
-
-# ---------------------------------#
-
 # Page layout
-# Page expands to full width
-
-st.set_page_config(page_title="Depth of Field Detection", layout="wide")
-
-
-# ---------------------------------#
+st.set_page_config(page_title="Depth of Field Detection", page_icon=":camera:", layout="wide")
 
 # Sidebar options
 st.sidebar.title("Prediction Settings")
@@ -32,26 +23,14 @@ model_choice = []
 st.sidebar.write("Choose a model for prediction")
 model_choice.append(st.sidebar.radio("", models))
 
-# ---------------------------------#
-
-# Main Page options
-
-col1, col2, col3 = st.columns([1, 6, 1])
-
-
-with col2:
+with st.container():
     st.title("Depth of Field detection w/ Deep Learning")
-
-with col2:
     st.image(
         "https://source.unsplash.com/mj2NwYH3wBA/960x640",
-        width=1200,
+        use_column_width="auto",
     )
 
-with col2:
     file = st.file_uploader("Upload an image", type=["jpg", "jpeg"])
-
-with col2:
 
     if file is not None:
         img = Image.open(file)
@@ -79,5 +58,3 @@ with col2:
                 st.header("Prediction: No bokeh detected - Confidence {:.1f}%".format(prob * 100))
 
             st.write("Took {} seconds to run.".format(round(time.time() - start_time, 2)))
-
-# ---------------------------------#
