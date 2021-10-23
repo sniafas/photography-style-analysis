@@ -1,24 +1,22 @@
 {
     "dataset": {
-        "image_transform_dataset_path": "dataset/csv/",
-        "resized_path": "dataset/images/",
-        "img_path": "dataset/images/unsplash-horizontal/"
+        "resized_path": "dataset/images/resized",
+        "img_path": "dataset/images/source/"
     },
     "csv": {
         "dof": "csv/dof/dof_"
     },
     "al": {
         "cardinality_split": [
-            100
+            100,
+            200
         ],
-        "pool_dataset": "csv/active-learning/al_pool_dataset.csv",
-        "augment_pool": true,
-        "setting": "sim",
-        "selection_method": "sample_augmented"
+        "pool_dataset": "dataset/csv/active-learning/al_pool_dataset.csv",
+        "training_mode": "sqal",
+        "ceal": false
     },
     "training": {
-        "training_method": "dof",
-        "training_mode": "baseline",
+        "training_dataset": "dof",
         "model_arch": "densenet",
         "epochs": 2,
         "batch_size": 32,

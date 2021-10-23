@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/python
 
-import datetime
-import importlib
-import os
 import pandas as pd
-import sys
 import json
-
 
 import tensorflow as tf
 from tensorflow.keras.models import load_model
@@ -17,10 +12,9 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 from src.configuration.config import Configuration
 from src.configuration.ml_config import SEED
-from src.utils.gpu_util import set_seeds, set_device
+from src.utils.gpu_util import set_seeds
 from src.utils.train_utils import (
     get_optimizer,
-    get_true_labels,
     losses_and_metrics,
     model_initialise,
     read_dataset_from_csv,
@@ -29,7 +23,7 @@ from src.utils.train_utils import (
     plot_training,
 )
 from src.utils.training_callbacks import early_stopping, model_chpnt, reduce_on_plateau
-from src.utils.general_utils import dump_pickled_data, load_pickled_data, get_filepath, get_folder_path
+from src.utils.general_utils import get_artifact_names, dump_pickled_data, get_filepath
 
 
 def status(opt_name, lr, image_size, k, reps, seed, method, mode, model, split):
@@ -54,6 +48,8 @@ class Train:
     def __init__(self):
 
         config = Configuration().get_configuration()
+
+        # hyperparameters
         self.normalize = config["training"]["normalize"]
         self.augment = config["training"]["augment"]
         self.lr = config["training"]["lr"]
@@ -68,15 +64,15 @@ class Train:
         self.k = config["training"]["filters"]
         self.reps = config["training"]["repetitions"]
 
-        # Load dataset paths
+        # load dataset paths
         self.dof_dataset_path = config["csv"]["dof"]
         self.model_arch = config["training"]["model_arch"]
         self.al_pool_dataset = config["al"]["pool_dataset"]
-        self.augment_al_pool = config["al"]["augment_pool"]
 
-        self.active_setting = config["al"]["setting"]
-        self.selection_method = config["al"]["selection_method"]
+        # active learning settings
+        self.ceal = config["al"]["ceal"]
 
+        # log status
         status(
             config["training"]["optimizer"],
             config["training"]["lr"],
@@ -84,8 +80,8 @@ class Train:
             self.k,
             self.reps,
             SEED,
-            config["training"]["training_method"],
-            config["training"]["training_mode"],
+            config["training"]["training_dataset"],
+            config["al"]["training_mode"],
             config["training"]["model_arch"],
             self.cardinality_split,
         )
@@ -109,59 +105,43 @@ class Train:
 
                 pool_dataset = pd.read_csv(self.al_pool_dataset)
                 base_dir = "randomly_results"
-
-                save_model_name = get_filepath(f"trained_models/{base_dir}/{self.model_arch}", f"model_rnd_{cardinality_split}_seed_{SEED}.h5")
-                save_training_hist_name = get_filepath(
-                    f"trained_models/{base_dir}/{self.model_arch}", f"training_hist_model_rnd_{cardinality_split}_seed_{SEED}"
-                )
-                save_test_results_name = get_filepath(
-                    f"trained_models/{base_dir}/{self.model_arch}", f"test_results_model_rnd_{cardinality_split}_seed_{SEED}.json"
-                )
-                save_cm_name = get_filepath(f"trained_models/{base_dir}/{self.model_arch}", f"cm_model_rnd_{cardinality_split}_{SEED}")
-
-                save_report_name = get_filepath(
-                    f"trained_models/{base_dir}/{self.model_arch}", f"report_model_rnd_{cardinality_split}_seed_{SEED}"
-                )
-                save_training_hist_plot = get_filepath(
-                    f"trained_models/{base_dir}/{self.model_arch}", f"learning_history_rnd_{cardinality_split}_seed_{SEED}"
-                )
+                (
+                    save_model_name,
+                    save_training_hist_name,
+                    save_training_hist_plot,
+                    save_test_results_name,
+                    save_cm_name,
+                    save_report_name,
+                ) = get_artifact_names(base_dir, self.model_arch, cardinality_split, SEED)
 
                 train_data, valid_data = active_data_splits(
                     train_data, valid_data, pool_dataset, cardinality_split, mode=mode
                 )
 
-            elif mode == "active":
-                print("Actively selected samples")
-                # actively mode simulation
-                # 1000 + 1000 samples
+            elif "sqal" in mode:
+                base_dir = f"actively_results_{mode}"
+                al_inference_results = []
+                pseudolabels = 0
+
+                # load active pool
                 pool_dataset = pd.read_csv(self.al_pool_dataset)
 
-                # a) inference on the 2000 annotated samples, obscuring their labels
-                if self.active_setting == "sim":
-                    # simulate active learning using bootstrap model to inference in the total unlabelled instances
+                # simulate active learning using bootstrap model to inference in the total "unlabelled" instances
+                model = load_model(get_filepath("trained_models/baseline", f"{self.model_arch}.h5"), compile=False)
 
-                    model = load_model(
-                        "../trained_models/baseline/{}/model_baseline.h5".format(self.model_arch),
-                        compile=False,
-                    )
-
-                    # get a dataset without labels to inference
-                    selection_al_ds = dataset_to_tensor(
-                        pool_dataset, batch_size=self.batch_size, shuffle=False, mode="al"
-                    )
+                # get a dataset without labels to inference
+                selection_al_ds = dataset_to_tensor(pool_dataset, batch_size=self.batch_size, shuffle=False, mode="al")
 
                 predictions = model.predict(selection_al_ds, workers=1)
                 del model
 
-                al_inference_results = []
-                pseudolabels = 0
-
+                # create active pool
                 for i, (_, img_filename) in enumerate(selection_al_ds.unbatch()):
                     img_name = str(img_filename.numpy().decode("utf8").split("/")[-1])
                     probability = float(predictions[i][np.argmax(predictions[i])])
 
-                    # in label augmentation + high confident preds, assign the predicted label as groundtruth
-                    if self.augment_al_pool and probability >= 0.9:
+                    # cost effective al, create pseudolabels
+                    if self.ceal and probability >= 0.9:
                         label = int(np.argmax(predictions[i]))
                         pseudolabels += 1
 
@@ -177,62 +157,58 @@ class Train:
                 )
 
                 pool_al_dataset_sorted = pool_al_dataset.sort_values(by="preds").reset_index(drop=True)
-                print(pool_al_dataset_sorted)
-                print(pseudolabels)
 
                 # c) train by slices
                 print("------------{}----------".format(cardinality_split))
-                save_model_name = "../trained_models/actively_results_{}/{}/model_active_{}_seed_{}.h5".format(
-                    self.selection_method, self.model_arch, cardinality_split, SEED
-                )
-                save_training_hist_name = (
-                    "../trained_models/actively_results_{}/{}/results/training_hist_model_active_{}_seed_{}".format(
-                        self.selection_method, self.model_arch, cardinality_split, SEED
-                    )
-                )
-                save_test_results_name = "../trained_models/actively_results_{}/{}/results/test_results_model_active_{}_seed_{}.json".format(
-                    self.selection_method, self.model_arch, cardinality_split, SEED
-                )
-                save_cm_name = "../trained_models/actively_results_{}/{}/results/cm_model_active_{}_seed_{}".format(
-                    self.selection_method, self.model_arch, cardinality_split, SEED
-                )
-                save_report_name = (
-                    "../trained_models/actively_results_{}/{}/results/report_model_active_{}_seed_{}".format(
-                        self.selection_method, self.model_arch, cardinality_split, SEED
-                    )
-                )
+
+                (
+                    save_model_name,
+                    save_training_hist_name,
+                    save_training_hist_plot,
+                    save_test_results_name,
+                    save_cm_name,
+                    save_report_name,
+                ) = get_artifact_names(base_dir, self.model_arch, cardinality_split, SEED)
 
                 # concatenate sliced pool dataset to the baseline dataset
                 train_data, valid_data = active_data_splits(
                     train_data, valid_data, pool_al_dataset_sorted, cardinality_split, mode=mode
                 )
 
-            elif mode == "active_production":
+            elif "all" in mode:
                 print("------------{}----------".format(cardinality_split))
+                base_dir = f"actively_results_{mode}"
 
                 pseudolabels = 0
                 if cardinality_split == 100:
-                    pool_dataset = pd.read_csv("../dataset/csv/active-learning/al_pool_dataset.csv")
-                    save_path = "../trained_models/baseline/{}/".format(self.model_arch)
-                    model = load_model(save_path + "model_baseline.h5", compile=False)
+                    # load active pool
+                    pool_dataset = pd.read_csv(self.al_pool_dataset)
+                    # simulate active learning using bootstrap model to inference in the total "unlabelled" instances
+                    model = load_model(get_filepath("trained_models/baseline", f"{self.model_arch}.h5"), compile=False)
 
                 else:
                     previous_selection = pd.read_csv(
-                        "../dataset/csv/active-learning/{}/{}/active_selection_{}_{}.csv".format(
-                            self.selection_method, self.model_arch, cardinality_split - 100, SEED
+                        get_filepath(
+                            f"dataset/csv/active_learning/{mode}",
+                            f"{self.model_arch}_active_selection_{cardinality_split-100}_{SEED}.csv",
                         )
                     )
+
                     pool_dataset = pd.read_csv(
-                        "../dataset/csv/active-learning/{}/{}/annotation_pool_{}_{}.csv".format(
-                            self.selection_method, self.model_arch, cardinality_split - 100, SEED
+                        get_filepath(
+                            f"dataset/csv/active_learning/{mode}",
+                            f"{self.model_arch}_annotation_pool_{cardinality_split-100}_{SEED}.csv",
                         )
                     )
+
                     model = load_model(
-                        "../trained_models/actively_results_{}/{}/model_active_{}_seed_{}.h5".format(
-                            self.selection_method, self.model_arch, cardinality_split - 100, SEED
+                        get_filepath(
+                            f"trained_models/{base_dir}/{self.model_arch}",
+                            f"model_{cardinality_split-100}_seed_{SEED}.h5",
                         ),
                         compile=False,
                     )
+
                 pool_ds = dataset_to_tensor(pool_dataset, batch_size=self.batch_size, shuffle=False, mode="al")
                 predictions = model.predict(pool_ds)
 
@@ -242,8 +218,8 @@ class Train:
                     img_name = str(img_filename.numpy().decode("utf8").split("/")[-1])
                     probability = float(predictions[i][np.argmax(predictions[i])])
 
-                    # in label augmentation + high confident preds, assign the predicted label as groundtruth
-                    if self.augment_al_pool and probability >= 0.9:
+                    # cost effective al, create pseudolabels
+                    if self.ceal and probability >= 0.9:
                         label = int(np.argmax(predictions[i]))
                         pseudolabels += 1
 
@@ -259,10 +235,8 @@ class Train:
                 )
 
                 pool_al_dataset_sorted = pool_al_dataset.sort_values(by="preds").reset_index(drop=True)
-                print(pool_al_dataset_sorted.shape)
 
-                ##### Calculate support bins ###
-
+                # Calculate support bins
                 al_inference_results = {}
                 for i, (_, img_filename) in enumerate(pool_ds.unbatch()):
                     al_inference_results[str(img_filename.numpy().decode("utf8").split("/")[-1])] = {
@@ -293,32 +267,19 @@ class Train:
 
                 support_bins = [len(bin_1), len(bin_2), len(bin_3), len(bin_4), len(bin_5)]
 
-                save_model_name = "../trained_models/actively_results_{}/{}/model_active_{}_seed_{}.h5".format(
-                    self.selection_method, self.model_arch, cardinality_split, SEED
+                save_support_bins = get_filepath(
+                    f"trained_models/{base_dir}/{self.model_arch}",
+                    f"support_bins_active_{cardinality_split}_seed_{SEED}",
                 )
 
-                save_support_bins = (
-                    "../trained_models/actively_results_{}/{}/results/support_bins_active_{}_seed_{}".format(
-                        self.selection_method, self.model_arch, cardinality_split, SEED
-                    )
-                )
-
-                save_training_hist_name = (
-                    "../trained_models/actively_results_{}/{}/results/training_hist_model_active_{}_seed_{}".format(
-                        self.selection_method, self.model_arch, cardinality_split, SEED
-                    )
-                )
-                save_test_results_name = "../trained_models/actively_results_{}/{}/results/test_results_model_active_{}_seed_{}.json".format(
-                    self.selection_method, self.model_arch, cardinality_split, SEED
-                )
-                save_cm_name = "../trained_models/actively_results_{}/{}/results/cm_model_active_{}_seed_{}".format(
-                    self.selection_method, self.model_arch, cardinality_split, SEED
-                )
-                save_report_name = (
-                    "../trained_models/actively_results_{}/{}/results/report_model_active_{}_seed_{}".format(
-                        self.selection_method, self.model_arch, cardinality_split, SEED
-                    )
-                )
+                (
+                    save_model_name,
+                    save_training_hist_name,
+                    save_training_hist_plot,
+                    save_test_results_name,
+                    save_cm_name,
+                    save_report_name,
+                ) = get_artifact_names(base_dir, self.model_arch, cardinality_split, SEED)
 
                 if cardinality_split == 100:
                     new_active_ds = pool_al_dataset_sorted[:100]
@@ -329,33 +290,28 @@ class Train:
                 # save dataset for next round
                 next_pool_dataset = pool_al_dataset_sorted[100:]
                 next_pool_dataset.to_csv(
-                    "../dataset/csv/active-learning/{}/{}/annotation_pool_{}_{}.csv".format(
-                        self.selection_method, self.model_arch, cardinality_split, SEED
+                    get_filepath(
+                        f"dataset/csv/active_learning/{mode}",
+                        f"{self.model_arch}_annotation_pool_{cardinality_split}_{SEED}.csv",
                     )
                 )
                 new_active_ds["label"] = new_active_ds["label"].astype(int)
                 new_active_ds.to_csv(
-                    "../dataset/csv/active-learning/{}/{}/active_selection_{}_{}.csv".format(
-                        self.selection_method, self.model_arch, cardinality_split, SEED
+                    get_filepath(
+                        f"dataset/csv/active_learning/{mode}",
+                        f"{self.model_arch}_active_selection_{cardinality_split}_{SEED}.csv",
                     )
                 )
-
-                train_data = read_dataset_from_csv("train", "../dataset/csv/dof/dof_")
-                valid_data = read_dataset_from_csv("valid", "../dataset/csv/dof/dof_")
-                test_data = read_dataset_from_csv("test", "../dataset/csv/dof/dof_")
 
                 train_data, valid_data = active_data_splits(
                     train_data, valid_data, new_active_ds, cardinality_split, mode="active"
                 )
 
-                print(next_pool_dataset)
-                print(support_bins)
                 print("Pseudolabels: {}".format(pseudolabels))
                 # save support bins
                 dump_pickled_data(save_support_bins, support_bins)
 
             else:
-                print("Train baseline")
                 base_dir = "baseline"
 
                 save_model_name = get_filepath(f"trained_models/{base_dir}/{self.model_arch}", "model.h5")
@@ -366,9 +322,7 @@ class Train:
                     f"trained_models/{base_dir}/{self.model_arch}", "test_results_model.json"
                 )
                 save_cm_name = get_filepath(f"trained_models/{base_dir}/{self.model_arch}", "cm_model")
-                save_report_name = get_filepath(
-                    f"trained_models/{base_dir}/{self.model_arch}", "report_model"
-                )
+                save_report_name = get_filepath(f"trained_models/{base_dir}/{self.model_arch}", "report_model")
                 save_training_hist_plot = get_filepath(
                     f"trained_models/{base_dir}/{self.model_arch}", "learning_history"
                 )
@@ -415,7 +369,7 @@ class Train:
             # plot training history
             plot_training(results.history, save_training_hist_plot)
 
-            ## Inference on test
+            # inference on test
             model = load_model(save_model_name, compile=True)
 
             # Evaluate Model

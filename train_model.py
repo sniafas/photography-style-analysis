@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/python
 
-import os
-
 from src.utils.gpu_util import set_seeds, set_device
 
 set_seeds()
@@ -16,12 +14,12 @@ def main():
     """Main method"""
 
     config = Configuration().get_configuration()
-    training_mode = config["training"]["training_mode"]
+    training_mode = config["al"]["training_mode"]
 
     print("Start Training...")
     c_graph = training.Train()
 
-    if config["training"]["training_method"] == "dof":
+    if config["training"]["training_dataset"] == "dof":
         c_graph.dof(mode=training_mode)
 
 
