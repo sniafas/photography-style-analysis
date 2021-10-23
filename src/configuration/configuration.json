@@ -30,9 +30,7 @@
         "img_size_x": 300,
         "img_size_y": 200,
         "normalize": true,
-        "augment": true,
         "1h": true,
-        "num_classes": 2,
-        "timestamp": ""
+        "num_classes": 2
     }
 }

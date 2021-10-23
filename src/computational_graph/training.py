@@ -51,7 +51,6 @@ class Train:
 
         # hyperparameters
         self.normalize = config["training"]["normalize"]
-        self.augment = config["training"]["augment"]
         self.lr = config["training"]["lr"]
         self.epochs = config["training"]["epochs"]
         self.img_size = [
