@@ -21,23 +21,37 @@ For more details about images, please check CHANGELOG->DATA and DOCS->image_anal
 
 # Repository organization
 
-## Running scripts
-
-
 ## Image transformation
 
-From im_analysis module
 ```
-python im_analysis.py
+(image_analysis module)$ python im_analysis.py
 ```
 
 ## Training
 
-To initiate training, you will need a CUDA capable GPU with cuda/cuDNN drivers enabled.
-1. Edit ``configuration.json``
-2. (optional) Edit architecture from ``architectures`` module
-2. Train model
+To initiate training, the following configurations should be available
 
+
+1. Edit ``configuration.json``
+```
+"training_mode": "sqal/sqal_ceal/all/all_ceal"
+"ceal": true/false
+"model_arch": "densenet/vgg"
+"optimizer": "adam/nadam/rms/adagrad/sgd/adadelta"
+```
+2. Train model
 ```
 python train_model.py
 ```
+
+**Note:** A CUDA capable GPU with cuda/cuDNN drivers enabled and >=4GB RAM is recommended. TF 2.4 is compatible w/  `Cuda 11.0` and `cudnn v8.0.5 (November 9th, 2020), for CUDA 11.0`.
+
+NVIDIA's archive: <https://developer.nvidia.com/rdp/cudnn-archive>
+
+## Active Learning strategies
+
+Active Learning w/ Incremental Training Active Learning Loop
+![Active Learning Loop](/docs/active_learning_strategies/al_all_ceal.png)
+
+Active Learning w/ Single Quary Active Learning
+![Active Learning Loop](/docs/active_learning_strategies/al_sqal_ceal.png)
