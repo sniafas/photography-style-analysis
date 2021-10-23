@@ -57,7 +57,7 @@ with col2:
     if file is not None:
         img = Image.open(file)
         temp_file.write(file.getvalue())
-        st.image(img, caption="Uploaded image", width=300)
+        st.image(img, caption="Uploaded image", width=600)
 
         if st.button("Predict"):
             st.write("")
