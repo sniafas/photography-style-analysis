@@ -21,6 +21,19 @@ For more details about images, please check CHANGELOG->DATA and DOCS->image_anal
 
 # Repository organization
 
+## Install dependency libraries
+
+```
+# Install poetry
+$ pip install --user poetry
+
+# Install project's dependencies
+$ pip install --user poetry
+
+# Enable environment
+$ poetry shell
+```
+
 ## Image transformation
 
 ```
@@ -41,7 +54,7 @@ To initiate training, the following configurations should be available
 ```
 2. Train model
 ```
-python train_model.py
+$ python train_model.py
 ```
 
 **Note:** A CUDA capable GPU with cuda/cuDNN drivers enabled and >=4GB RAM is recommended. TF 2.4 is compatible w/  `Cuda 11.0` and `cudnn v8.0.5 (November 9th, 2020), for CUDA 11.0`.
