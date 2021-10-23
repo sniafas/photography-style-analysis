@@ -22,6 +22,7 @@ streamlit = "*"
 tensorflow = "2.3.1"
 tensorflow_addons = "0.11.2"
 pyproject-toml = "^0.0.11"
+gdown = "^4.2.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.910"
