@@ -4,10 +4,9 @@
 
 # Photography Style Analysis Using Machine Learning
 
-## Download images
+## DoF dataset
 
-Lite dataset contains 25K images in high resolution [~211GB].
-For this project, images are transformed and released in
+A novel dataset to quantify **image aesthetics** and camera *bokeh* released in various image formats.
 
 - **Horizontal (900x600) images:** [⬇️download](https://drive.google.com/file/d/1zgNqZMDsziN0M3gCeXSHOkmP6wW_owsG/view?usp=sharing) [2.21GB]
 
@@ -15,9 +14,20 @@ For this project, images are transformed and released in
 
 - **Annotations**: [⬇️download](https://drive.google.com/drive/folders/1_R5zhWI-ZMQ7al_Pb7m8GXGyjjBI92Yf?usp=sharing)
 
+## Pretrained models
+
+Pretrained models trained on DoF dataset, in passive and active learning with DenseNet (lite) and pretrained VGG architectures
+
 - **Pretrained Models**: [⬇️download](https://drive.google.com/drive/folders/1eEZiWqc_LJa12QMf9qKzKh8-vR0gAKM-?usp=sharing)
 
-For more details about images, please check CHANGELOG->DATA and DOCS->image_analysis
+
+# Active Learning strategies
+
+Active Learning w/ Incremental Training Active Learning Loop
+![Active Learning Loop](/docs/active_learning_strategies/al_all_ceal.png)
+
+Active Learning w/ Single Query Active Learning
+![Active Learning Loop](/docs/active_learning_strategies/al_sqal_ceal.png)
 
 # Repository organization
 
@@ -57,14 +67,6 @@ To initiate training, the following configurations should be available
 $ python train_model.py
 ```
 
-**Note:** A CUDA capable GPU with cuda/cuDNN drivers enabled and >=4GB RAM is recommended. TF 2.4 is compatible w/  `Cuda 11.0` and `cudnn v8.0.5 (November 9th, 2020), for CUDA 11.0`.
+**Note:** A CUDA capable GPU with cuda/cuDNN drivers enabled and >=4GB RAM is recommended. TF 2.4 is compatible w/  `Cuda 11.0` and `cudnn v8.0.5`.
 
 NVIDIA's archive: <https://developer.nvidia.com/rdp/cudnn-archive>
-
-## Active Learning strategies
-
-Active Learning w/ Incremental Training Active Learning Loop
-![Active Learning Loop](/docs/active_learning_strategies/al_all_ceal.png)
-
-Active Learning w/ Single Quary Active Learning
-![Active Learning Loop](/docs/active_learning_strategies/al_sqal_ceal.png)
