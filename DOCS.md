@@ -4,19 +4,19 @@
 
 The DoF based annotated dataset
 
-## csv/dataset.csv
-
-The `dataset.csv` contains the entire dataset of 25K images. It contains all null and non null cleaned and free from noise EXIF features with photo orientation (1 horizontal, 0 vertical)
-
-# Codebase
+# Source
 
 ## architectures
 
-Various architectures
+Various deep learning architectures
 
 ## configuration
 
 Project's configuration entry point. Configuration is used from modules of the project for more efficient control and scaling up
+
+## computational_graph
+
+Computational graph for passive and active learning
 
 ## image_analysis
 
@@ -37,6 +37,10 @@ Various interfaces in notebooks and .py executables to access project's modules.
     - Exif analysis
     - Label distribution
     - Misc experimental section
+
+## transformations
+
+Basic image and label transformations 
 
 ## utils
 
